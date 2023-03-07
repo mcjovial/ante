@@ -16,9 +16,11 @@ import { getUserData } from './utils';
 const router = express.Router();
 
 router.post(
-  '/basic',
+  '/',
   validator(schema.signup),
   asyncHandler(async (req: RoleRequest, res) => {
+    console.log(req.body);
+    
     const user = await UserRepo.findByEmail(req.body.email);
     if (user) throw new BadRequestError('User already registered');
 
@@ -26,13 +28,18 @@ router.post(
     const refreshTokenKey = crypto.randomBytes(64).toString('hex');
     const passwordHash = await bcrypt.hash(req.body.password, 10);
 
-    const { user: createdUser, keystore } = await UserRepo.create(
-      {
-        name: req.body.name,
-        email: req.body.email,
+    const newUser = {
+      from: 'custom-db',
+      password: passwordHash,
+      data: {
+        displayName: req.body.displayName,
         profilePicUrl: req.body.profilePicUrl,
-        password: passwordHash,
-      } as User,
+        email: req.body.email
+      }
+    }
+
+    const { user: createdUser, keystore } = await UserRepo.create(
+      newUser as User,
       accessTokenKey,
       refreshTokenKey,
       RoleCode.LEARNER,
@@ -47,7 +54,8 @@ router.post(
 
     new SuccessResponse('Signup Successful', {
       user: userData,
-      tokens: tokens,
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
     }).send(res);
   }),
 );

@@ -13,15 +13,14 @@ async function exists(id: Types.ObjectId): Promise<boolean> {
 async function findPrivateProfileById(
   id: Types.ObjectId,
 ): Promise<User | null> {
-  return UserModel.findOne({ _id: id, status: true })
-    .select('+email')
+  return await UserModel.findOne({ _id: id, status: true })
+    .select('+data.email')
     .populate({
       path: 'roles',
       match: { status: true },
       select: { code: 1 },
     })
     .lean<User>()
-    .exec();
 }
 
 // contains critical information of the user
@@ -37,17 +36,16 @@ async function findById(id: Types.ObjectId): Promise<User | null> {
 }
 
 async function findByEmail(email: string): Promise<User | null> {
-  return UserModel.findOne({ email: email })
-    .select(
-      '+email +password +roles +gender +dob +grade +country +state +city +school +bio +hobbies',
-    )
+  return await UserModel.findOne({ 'data.email': email })
+    // .select(
+    //   '+email +password +roles +gender +dob +grade +country +state +city +school +bio +hobbies',
+    // )
     .populate({
       path: 'roles',
       match: { status: true },
       select: { code: 1 },
     })
     .lean()
-    .exec();
 }
 
 async function findFieldsById(

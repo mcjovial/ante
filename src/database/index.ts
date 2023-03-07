@@ -3,9 +3,10 @@ import Logger from '../core/Logger';
 import { db } from '../config';
 
 // Build the connection string
-const dbURI = `mongodb://${db.user}:${encodeURIComponent(db.password)}@${
-  db.host
-}:${db.port}/${db.name}`;
+const dbURI = 'mongodb+srv://mcjovial:19971104Mj@int-dev.99vrolk.mongodb.net/?retryWrites=true&w=majority';
+// const dbURI = `mongodb://${db.user}:${encodeURIComponent(db.password)}@${
+//   db.host
+// }:${db.port}/${db.name}`;
 
 const options = {
   autoIndex: true,

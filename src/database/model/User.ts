@@ -6,35 +6,110 @@ export const COLLECTION_NAME = 'users';
 
 export default interface User {
   _id: Types.ObjectId;
-  name?: string;
-  profilePicUrl?: string;
-  email?: string;
+  from?: string;
   password?: string;
   roles: Role[];
+  data: UserData
   verified?: boolean;
   status?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
+
+interface Address {
+  city: string;
+  country: string;
+  street: string;
+}
+
+interface UserData {
+  displayName: string;
+  firstName?: string;
+  lastName?: string;
+  profilePicUrl?: string;
+  email: string;
+  settings?: Settings
+  shortcuts?: string[]
+  address?: Address
+}
+
+interface Settings {
+  layout: {
+    style: string;
+    config: {
+      mode: string;
+      scroll: string;
+      navbar: {
+        display: boolean;
+      }
+      toolbar: {
+        display: boolean;
+        position: string;
+      }
+      footer: {
+        display: boolean;
+        style: string;
+      }
+    }
+  }
+  customScrollbars: boolean;
+  theme: {any: any}
+}
+
+const addressSchema = new Schema<Address>({
+  city: String,
+  country: String,
+  street: String,
+});
+
+const settingsSchema = new Schema<Settings>({
+  layout: {
+    style: String,
+    config: {
+      mode: String,
+      scroll: String,
+      navbar: {
+        display: Boolean,
+      },
+      toolbar: {
+        display: Boolean,
+        position: String,
+      },
+      footer: {
+        display: Boolean,
+        style: String,
+      },
+    },
+  },
+  customScrollbars: Boolean,
+  // theme: {any: any},
+})
+
+const userDataSchema = new Schema<UserData>({
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    // sparse: true, // allows null
+    trim: true,
+    select: false,
+  },
+  firstName: String,
+  lastName: String,
+  displayName: String,
+  profilePicUrl: {
+    type: Schema.Types.String,
+    trim: true,
+  },
+  settings: settingsSchema,
+  shortcuts: [{ type: String, lowercase: true, trim: true }],
+  address: addressSchema,
+})
+
 
 const schema = new Schema<User>(
   {
-    name: {
-      type: Schema.Types.String,
-      trim: true,
-      maxlength: 200,
-    },
-    profilePicUrl: {
-      type: Schema.Types.String,
-      trim: true,
-    },
-    email: {
-      type: Schema.Types.String,
-      unique: true,
-      sparse: true, // allows null
-      trim: true,
-      select: false,
-    },
+    from: String,
     password: {
       type: Schema.Types.String,
       select: false,
@@ -57,19 +132,11 @@ const schema = new Schema<User>(
       type: Schema.Types.Boolean,
       default: true,
     },
-    createdAt: {
-      type: Schema.Types.Date,
-      required: true,
-      select: false,
-    },
-    updatedAt: {
-      type: Schema.Types.Date,
-      required: true,
-      select: false,
-    },
+    data: userDataSchema,
   },
   {
     versionKey: false,
+    timestamps: true,
   },
 );
 

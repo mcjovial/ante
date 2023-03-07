@@ -16,8 +16,11 @@ COPY --chown=node:node . .
 # installing the dependencies into the container
 RUN npm install
 
+#Build codebase into JS
+RUN npm run build
+
 # container exposed network port number
 EXPOSE 3000
 
 # command to run within the container
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "watch-node" ]
